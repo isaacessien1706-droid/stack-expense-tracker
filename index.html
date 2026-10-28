@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Executive Expense Approval Stack | LIFO Visualizer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Executive Bar -->
+  <header>
+    <div class="header-container">
+      <div>
+        <span class="brand-badge">LIFO Data Structure Application</span>
+        <h1 class="brand-title">Corporate Expense Approval &amp; Audit Chain</h1>
+      </div>
+      <div class="nav-tabs">
+        <button id="tabSimBtn" class="tab-btn active" onclick="switchView('sim')">Interactive Simulator</button>
+        <button id="tabCppBtn" class="tab-btn" onclick="switchView('cpp')">C++ Source Code</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- VIEW 1: INTERACTIVE STACK SIMULATOR -->
+  <main id="simView">
+    <div class="grid-layout">
+
+      <!-- Left Column: Controls & Telemetry -->
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-subtitle">Active Reimbursement Voucher</div>
+              <h2 class="card-title">INV-2026-089: Server Rack Upgrade</h2>
+            </div>
+            <div class="amount-pill">$4,500.00</div>
+          </div>
+
+          <div class="form-group">
+            <label for="approverInput">Next Signatory Name &amp; Role</label>
+            <input id="approverInput" type="text" value="Kwame Mensah (Software Eng)" />
+          </div>
+
+          <div class="form-group">
+            <label for="noteInput">Approval Stamp Note / Audit Rejection Reason</label>
+            <input id="noteInput" type="text" value="Attached vendor invoice & hardware spec" />
+          </div>
+
+          <div class="btn-grid">
+            <button class="action-btn btn-push" onclick="pushSignature()">
+              &#8593; push() Sign-Off
+            </button>
+            <button class="action-btn btn-pop" onclick="popSignature()">
+              &#8595; pop() Reject 1 Level
+            </button>
+            <button class="action-btn btn-secondary" onclick="peekSignature()">
+              &#128269; peek() Top Stamp
+            </button>
+            <button class="action-btn btn-secondary" onclick="resetWorkflow()">
+              &#8634; Reset Invoice
+            </button>
+          </div>
+        </section>
+
+        <!-- Stack Telemetry Log -->
+        <section class="card">
+          <div class="card-header" style="margin-bottom: 0.85rem; padding-bottom: 0.65rem;">
+            <div>
+              <div class="card-subtitle">Real-Time Stack Operations</div>
+              <h3 class="card-title" style="font-size: 1rem;">LIFO Execution Log</h3>
+            </div>
+            <span id="sizeCounter" style="font-family: monospace; font-size: 0.8rem; font-weight: 700; color: var(--burgundy-primary);">
+              size(): 0 / 4
+            </span>
+          </div>
+
+          <div id="statusBanner" class="status-banner">
+            Ready. Awaiting Level 1 Employee Submission.
+          </div>
+
+          <div id="logContainer" class="log-box"></div>
+        </section>
+      </div>
+
+      <!-- Right Column: Visual LIFO Stack -->
+      <section class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="card-header">
+            <div>
+              <div class="card-subtitle">Strict Last-In, First-Out Hierarchy</div>
+              <h2 class="card-title">Invoice Signature Stack</h2>
+            </div>
+            <span id="payoutBadge" class="payout-badge">Awaiting 4 Approvals</span>
+          </div>
+
+          <!-- 4-Stage Hierarchy Stepper -->
+          <div class="stepper">
+            <div id="step1" class="step-pill">1. Employee</div>
+            <div id="step2" class="step-pill">2. Team Lead</div>
+            <div id="step3" class="step-pill">3. Finance Mgr</div>
+            <div id="step4" class="step-pill">4. Director</div>
+          </div>
+
+          <!-- Visual Stack Container -->
+          <div id="stackWell" class="stack-well"></div>
+        </div>
+
+        <div class="stack-base-label">
+          &#9650; Base of Stack (Level 1 Foundation) &mdash; Only TOP Element is Accessible &#9650;
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- VIEW 2: C++ SOURCE CODE & ARCHITECTURE NOTES -->
+  <main id="cppView" class="hidden">
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-subtitle">Assignment Deliverable</div>
+          <h2 class="card-title">Complete C++17 Implementation (Pure Stack Operations)</h2>
+        </div>
+        <button class="action-btn btn-push" onclick="copyCppCode()" id="copyBtn">Copy C++ Code</button>
+      </div>
+
+      <p style="font-size: 0.9rem; color: var(--text-muted);">
+        This C++ program implements a custom templated <code>Stack&lt;T&gt;</code> class from scratch and uses pure <code>push()</code>, <code>pop()</code>, <code>peek()</code>, <code>isEmpty()</code>, and <code>isFull()</code> operations.
+      </p>
+
+      <pre id="cppCodeBlock" class="code-block">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;iomanip&gt;
+
+struct ApprovalStamp {
+    int level;
+    std::string roleTitle;
+    std::string approverName;
+    std::string comment;
+};
+
+template &lt;typename T&gt;
+class Stack {
+private:
+    std::vector&lt;T&gt; items;
+    int maxCapacity;
+public:
+    Stack(int capacity = 4) : maxCapacity(capacity) {}
+    bool isEmpty() const { return items.empty(); }
+    bool isFull() const { return static_cast&lt;int&gt;(items.size()) &gt;= maxCapacity; }
+    int size() const { return static_cast&lt;int&gt;(items.size()); }
+    int getCapacity() const { return maxCapacity; }
+
+    void push(const T&amp; item) {
+        if (!isFull()) items.push_back(item);
+    }
+    T pop() {
+        T topItem = items.back();
+        items.pop_back();
+        return topItem;
+    }
+    T peek() const { return items.back(); }
+};
+
+class ExpenseInvoiceWorkflow {
+private:
+    std::string invoiceTitle;
+    double amount;
+    Stack&lt;ApprovalStamp&gt; approvalStack;
+    Stack&lt;ApprovalStamp&gt; tempStack;
+
+    const std::vector&lt;std::string&gt; roles = {
+        "1. Employee Submission",
+        "2. Team Lead Sign-Off",
+        "3. Finance Manager Audit",
+        "4. Executive Director Sign-Off"
+    };
+
+public:
+    ExpenseInvoiceWorkflow(const std::string&amp; title, double amt)
+        : invoiceTitle(title), amount(amt), approvalStack(4), tempStack(4) {}
+
+    void approveNextLevel(const std::string&amp; name, const std::string&amp; note) {
+        if (approvalStack.isFull()) {
+            std::cout &lt;&lt; "[OVERFLOW] Invoice already has all 4 approvals!\n";
+            return;
+        }
+        int idx = approvalStack.size();
+        approvalStack.push({idx + 1, roles[idx], name, note});
+        std::cout &lt;&lt; "[PUSH] " &lt;&lt; roles[idx] &lt;&lt; " signed by " &lt;&lt; name &lt;&lt; "\n";
+    }
+
+    void rejectAndStepBack(const std::string&amp; reason) {
+        if (approvalStack.isEmpty()) {
+            std::cout &lt;&lt; "[UNDERFLOW] No signatures on stack to revoke!\n";
+            return;
+        }
+        ApprovalStamp revoked = approvalStack.pop();
+        std::cout &lt;&lt; "[POP] Revoked " &lt;&lt; revoked.roleTitle &lt;&lt; " | Reason: " &lt;&lt; reason &lt;&lt; "\n";
+    }
+
+    void displayApprovalChain() {
+        std::cout &lt;&lt; "\n--- INVOICE APPROVAL STACK (" &lt;&lt; approvalStack.size() &lt;&lt; "/4) ---\n";
+        bool isTop = true;
+        while (!approvalStack.isEmpty()) {
+            ApprovalStamp s = approvalStack.pop();
+            tempStack.push(s);
+            std::cout &lt;&lt; (isTop ? "[TOP]    " : "[LOCKED] ") &lt;&lt; s.roleTitle
+                      &lt;&lt; " | " &lt;&lt; s.approverName &lt;&lt; " (\"" &lt;&lt; s.comment &lt;&lt; "\")\n";
+            isTop = false;
+        }
+        while (!tempStack.isEmpty()) {
+            approvalStack.push(tempStack.pop());
+        }
+        std::cout &lt;&lt; "------------------------------------------\n\n";
+    }
+};
+
+int main() {
+    ExpenseInvoiceWorkflow invoice("Server Rack Upgrade", 4500.00);
+    invoice.approveNextLevel("Kwame Mensah", "Attached vendor quote");
+    invoice.approveNextLevel("Ama Osei", "Verified department budget");
+    invoice.approveNextLevel("Kofi Boateng", "VAT compliance checked");
+    invoice.displayApprovalChain();
+
+    invoice.rejectAndStepBack("Recalculate 2.5% levy before Director sign-off");
+    invoice.displayApprovalChain();
+
+    invoice.approveNextLevel("Kofi Boateng", "Levy updated and verified");
+    invoice.approveNextLevel("Esi Danquah", "Executive payout authorized");
+    invoice.displayApprovalChain();
+    return 0;
+}</pre>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
